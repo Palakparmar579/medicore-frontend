@@ -20,7 +20,7 @@ function ManageRoles() {
 
   // ✅ FIX: should be null, not false
   const [editId, seteditId] = useState(null);
-
+const token =localStorage.getItem("token")
   const [formData, setformData] = useState({
     role: "",
     name: "",
@@ -77,98 +77,98 @@ function ManageRoles() {
 
   // SUBMIT------------------------------------------------------
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+ const handleFormSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!formData.role) return seterrorRoles("Please enter role");
-    if (!formData.name) return seterrorName("Please enter name");
-    if (!formData.age) return seterrorAge("Please enter age");
+  if (!formData.role) return seterrorRoles("Please enter role");
+  if (!formData.name) return seterrorName("Please enter name");
+  if (!formData.age) return seterrorAge("Please enter age");
 
-    if (formData.age < 1 || formData.age > 105) {
-      return seterrorAge("Age must be between 1 and 105");
-    }
+  if (formData.age < 1 || formData.age > 105) {
+    return seterrorAge("Age must be between 1 and 105");
+  }
 
-    if (!formData.email) return seterrorEmail("Please enter email");
+  if (!formData.email) return seterrorEmail("Please enter email");
 
-    if (!emailPattern.test(formData.email)) {
-      return seterrorEmail(
-        "Please enter a valid email address (example: user@example.com)"
-      );
-    }
-
-    // FIX: password required only in ADD
-    
-
-    
-
-    if (!formData.description)
-      return seterrorDescription("Please enter description");
-
-    //  FIX: proper duplicate check  
-    const existUser = roles.some(
-      (item) =>
-        item.email === formData.email && item._id !== editId
+  if (!emailPattern.test(formData.email)) {
+    return seterrorEmail(
+      "Please enter a valid email address (example: user@example.com)"
     );
+  }
 
-    if (existUser) {
-      return seterrorEmail("Email already exists");
-    }
+  if (!formData.description)
+    return seterrorDescription("Please enter description");
 
-    try {
-      let response;
+  // Duplicate check
+  const existUser = roles.some(
+    (item) => item.email === formData.email && item._id !== editId
+  );
 
-      if (editId) {
-        // UPDATE
-        response = await axios.put(
-          `${backendUrl}/api/auth/edit-user/${editId}`,
-          {
-            role: formData.role,
-            name: formData.name,
-            age: formData.age,
-            email: formData.email, 
-            description: formData.description,
-          }
-        );
+  if (existUser) {
+    return seterrorEmail("Email already exists");
+  }
 
-        // FIX: removed wrong toast.promise
-        toast.success("User updated successfully");
-        fetchRoles(); // 
-      } else {
-        // ADD
-        response = await axios.post(
-          `${backendUrl}/api/auth/register`,
-          {
-            role: formData.role,
-            name: formData.name,
-            age: Number(formData.age),
-            email: formData.email,
-            description: formData.description,
-          }
-        );
+  try {
+    let response;
 
-        if (response.status === 201) {
-          toast.success("User added successfully!");
-          fetchRoles();
-        }
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    if (editId) {
+      // UPDATE
+      response = await axios.put(
+        `${backendUrl}/api/auth/edit-user/${editId}`,
+        {
+          role: formData.role,
+          name: formData.name,
+          age: Number(formData.age),
+          email: formData.email,
+          description: formData.description,
+        },
+        config // ✅ token here
+      );
+
+      toast.success("User updated successfully");
+      fetchRoles();
+    } else {
+      // ADD
+      response = await axios.post(
+        `${backendUrl}/api/auth/register`,
+        {
+          role: formData.role,
+          name: formData.name,
+          age: Number(formData.age),
+          email: formData.email,
+          description: formData.description,
+        },
+        config // ✅ token here
+      );
+
+      if (response.status === 201) {
+        toast.success("User added successfully!");
+        fetchRoles();
       }
-
-      //  FIX: reset after both add & edit
-      setformData({
-        role: "",
-        name: "",
-        age: "",
-        email: "",
-        description: "",
-       
-      });
-
-      seteditId(null);
-      setshowForm(false);
-
-    } catch {
-      toast.error("Failed to register role");
     }
-  };
+
+    // Reset form
+    setformData({
+      role: "",
+      name: "",
+      age: "",
+      email: "",
+      description: "",
+    });
+
+    seteditId(null);
+    setshowForm(false);
+  } catch (error) {
+    console.log(error);
+    toast.error(error.response?.data?.message || "Failed to register role");
+  }
+};
 
   const handleCancel = () => {
     setshowForm(false);
