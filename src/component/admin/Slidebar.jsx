@@ -45,8 +45,7 @@ const AdminSlidebar = ({ handleLogout, handleProfile }) => {
   to="/admin/dashboard"
   className={({ isActive }) =>
     `group flex items-center gap-3 text-[14px] px-3 py-2 rounded-lg transition-all duration-300 hover:scale-90 
-    hover:shadow-xl 
-    
+    hover:shadow-xl    
     transition-all duration-300 ease-in-out 
     active:scale-90 active:shadow-md
     ${isActive ? "bg-[#0b4666] text-white" : "text-[#c7d3da] hover:bg-[#0b4666] hover:text-white"}`
@@ -120,7 +119,7 @@ const AdminSlidebar = ({ handleLogout, handleProfile }) => {
             flex justify-center items-center gap-2
             text-sm
             text-white
-            bg-gradient-to-r from-[#0b4666] to-[#095377]
+           bg-gradient-to-r from-[#5a0f0f] to-[#c30000]
             px-4 py-2
             rounded-md
             mt-4

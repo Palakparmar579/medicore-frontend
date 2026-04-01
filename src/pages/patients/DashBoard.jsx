@@ -8,7 +8,7 @@ function PatientDashboard() {
         {/* Welcome Card */}
         <div
           className="
-          bg-gradient-to-r from-[#00304e] via-[#003e47] to-[#00413c]
+          bg-gradient-to-r from-[#00304e] via-[#003e47] to-[#000000]
           rounded-2xl
           shadow-xl
           p-6

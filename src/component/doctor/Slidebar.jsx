@@ -7,6 +7,7 @@ import {
   FaUser,
   FaCalendarCheck,
 } from "react-icons/fa";
+import {NavLink } from "react-router-dom";
 
 const DoctorSlidebar = ({ handleLogout, handleProfile }) => {
   return (

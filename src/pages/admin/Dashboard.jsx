@@ -1,17 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaUserMd, FaUser, FaFemale } from "react-icons/fa";
-import { useOutletContext } from "react-router-dom";
+import axios from "axios";
 import DashboardCard from "../../component/admin/DashboardCard";
 
 function Dashboard() {
+const [stats,setStats]=useState({
+  doctor:"",
+  nurse:"",
+  patient:""
+})
 
-  const { roles } = useOutletContext();
+useEffect(()=>{
+  fetchStats();
+},[])
+ const backendUrl=import.meta.env.VITE_BACKEND_URL;
 
-  const doctorCount = roles.filter((item) => item.role === "doctor").length;
-  console.log(roles)
-  const patientCount = roles.filter((item) => item.role === "patient").length;
-  const nurseCount = roles.filter((item) => item.role === "nurse").length;
-
+ const fetchStats=async()=>{
+  try{
+    const response=await axios.get(
+      `${backendUrl}/api/auth/dashBoardStats`);
+      setStats(response.data)
+      console.log(response.data)
+  }
+  catch(error){
+         console.log(error)
+  }
+ }
+ const doctorCount=stats.doctor;
+ const nurseCount=stats.nurse;
+ const patientCount=stats.patient
   const cards = [
     {
       title: "Doctor",

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+
+import toast from "react-hot-toast";
 import axios from "axios";
+import MiniLoader from "../../component/admin/MiniLoader";
 
 function Login() {
   const navigate = useNavigate();
-
+  const [LoaderId,setLoaderId]=useState(false)
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorEmail, seterrorEmail] = useState("");
@@ -20,9 +22,7 @@ function Login() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const passwordPattern =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+ 
   const handleForget = () => {
     navigate("/forgetPass");
   };
@@ -39,7 +39,7 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     console.log("Backend URL:", backendUrl);
     console.log("Form Data:", form);
 
@@ -56,13 +56,8 @@ function Login() {
     if (!form.password) {
       return seterrorPassword("Please enter your password");
     }
-
-    if (!passwordPattern.test(form.password)) {
-      return seterrorPassword(
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
-      );
-    }
-
+setLoaderId(true);
+    
     setError("");
 
     try {
@@ -95,13 +90,13 @@ function Login() {
           navigate("/nurse", { replace: true });
         }
       }
-    } catch (err) {
-      setError(
-        err.response?.data?.message || "Login Failed, something went wrong"
-      );
+    } catch (error) {
+      toast.error(error.response?.data?.message||"something went wrong")
       setshowDisabled(false);
     }
-
+  finally{
+    setLoaderId(false);
+  }
     setForm({
       email: "",
       password: "",
@@ -114,12 +109,8 @@ function Login() {
   return (
     <div className="min-h-screen bg-[#00304e] flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-sm max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl bg-gradient-to-br from-white/90 to-transparent backdrop-blur-xl shadow-xl rounded-2xl p-6 sm:p-8 md:p-10">
-        {error && (
-          <p className="text-red-500 text-center mb-2 text-sm sm:text-base">
-            {error}
-          </p>
-        )}
-
+        
+         
         <h2 className="text-xl sm:text-2xl md:text-3xl text-white text-center font-semibold">
           Sign in
         </h2>
@@ -155,7 +146,7 @@ function Login() {
               name="password"
               placeholder="Password"
               value={form.password}
-              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+              
               title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
               onChange={handleChange}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-md border border-[#00304e] outline-none focus:border-white text-sm sm:text-base"
@@ -200,16 +191,28 @@ function Login() {
           </div>
 
           {/* Button */}
+
           <button
             type="submit"
-            disabled={showDisabled}
+            disabled={showDisabled||LoaderId}
             className={`${
-              !isFormFilled || showDisabled
-                ? "cursor-not-allowed opacity-60"
-                : "cursor-pointer hover:scale-105 active:scale-95"
-            } w-full py-2 sm:py-3 rounded-md text-white transition-all duration-300 ease-in-out bg-[#00416A] hover:bg-[#035a90] shadow-md hover:shadow-lg text-sm sm:text-base`}
+  !isFormFilled || showDisabled || LoaderId
+    ? "cursor-not-allowed opacity-60"
+    : "cursor-pointer hover:scale-105 active:scale-95"
+} 
+w-full py-2 sm:py-3 rounded-md text-white 
+transition-all duration-300 ease-in-out 
+bg-[#00416A] hover:bg-[#035a90] 
+shadow-md hover:shadow-lg 
+text-sm sm:text-base 
+flex items-center justify-center gap-2`}
           >
-            Login
+         { LoaderId?(
+          <><MiniLoader size="w-4 h-4"/>
+          Logging in...
+          </>):
+           ("Login")
+         }
           </button>
         </form>
       </div>

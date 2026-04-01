@@ -3,24 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Slidebar from '../component/admin/Slidebar'
 import { Outlet } from 'react-router-dom';
-import {toast } from "react-toastify";
+import {toast } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmationLog from '../pages/admin/ConfirmLog';
 import DeleteConformation from '../pages/admin/DeleteConformation';
+import MiniLoader from '../component/admin/MiniLoader';
 
 
 function AdminLayout(){
      const navigate = useNavigate()
      const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
+    const [showLoader,setShowLoader]=useState(false)
      const [confirmLog, setconfirmLog] = useState(false)
      const [showDeleteConf,setshowDeleteConf]=useState(false)
      const [roles, setRoles] = useState([]);
      const [deleteId,setDeleteId]=useState("")
+     const [page,setPage]=useState(1);
+     const [totalPages,settotalPages]=useState(1);
+     const limit=6;
 
           useEffect(() => {
-          fetchRoles()
-     }, [])
+          fetchRoles(page)
+     }, [page])
 
 
      const handleLogout = () => {
@@ -34,15 +38,19 @@ function AdminLayout(){
      }
 
      const handleConfirm = () => {
-          localStorage.removeItem("token")
-          localStorage.removeItem("role")
-          toast.info("Logged out successfully 👋");
-          setTimeout(() => {
-               navigate('/Login')
-          }, 3000)
-          setconfirmLog(false)
+           setconfirmLog(false); 
+           setShowLoader(true);
 
-     }
+         setTimeout(() => {
+        setShowLoader(false);   
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        toast.success("Logged out successfully 👋");
+        navigate('/Login');    
+    }, 2000);
+}
+     
+
 
      
       const onClose=()=>{
@@ -56,6 +64,7 @@ function AdminLayout(){
   const onConfirm=async()=>{
      setshowDeleteConf(false);
     try{
+
         await axios.delete(`${backendUrl}/api/auth/deleteUser/${deleteId}`);
           const restUser=roles.filter((item)=>item._id!==deleteId);
           setRoles(restUser);
@@ -68,11 +77,13 @@ function AdminLayout(){
 
   }
 
-     const fetchRoles = async () => {
+     const fetchRoles = async (pageNumber=1) => {
           try {              
                const response = await axios.get(
-                    `${backendUrl}/api/auth/getUser`);
-               setRoles(response.data);
+                    `${backendUrl}/api/auth/pagination?page=${pageNumber}&limit=${limit}`);
+               setRoles(response.data.data);
+               setPage(response.data.page);
+               settotalPages(response.data.totalPages);
           }
           catch (error) {
                console.log(error)
@@ -87,7 +98,7 @@ function AdminLayout(){
                          handleLogout={handleLogout}
                     />
                     <div className='flex pl-6'>
-                         <Outlet context={{ roles, setRoles, fetchRoles,handleDelete }} />
+                         <Outlet context={{ roles, setRoles, fetchRoles,handleDelete,page,setPage,totalPages }} />
                     </div>
                     {confirmLog &&
                          <ConfirmationLog
@@ -100,7 +111,13 @@ function AdminLayout(){
                            onClose={onClose}
                            onConfirm={onConfirm}
                          />
+                        
                         ) }
+                     {showLoader && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-[1100]">
+    <MiniLoader size="w-12 h-12" />
+  </div>
+)}
                </div>
           </div>
      )

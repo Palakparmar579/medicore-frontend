@@ -13,7 +13,8 @@ import Dashboard from './pages/admin/Dashboard';
 import PatientDashboard from './pages/patients/DashBoard';
 import NurseDashboard from './pages/nurse/Dashboard';
 import DoctorDashboard from './pages/doctor/Dashboard';
-import Navbar from './pages/Navbar';  
+
+import { Toaster } from "react-hot-toast";
 function App(){ 
 return(
     <BrowserRouter>
@@ -33,18 +34,18 @@ return(
         </Route> {/* <-- Properly close the parent Route */}
 
         <Route path='/doctor' element={<DoctorLayout/>}>
-        <Route index element={<DoctorDashboard/>} />
+        <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<DoctorDashboard/>}/>
         </Route>
         {/* Doctor */}
 
          <Route path='/patient' element={<PatientLayout/>}>
-        <Route index element={<PatientDashboard/>} />
+       <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<PatientDashboard/>}/>
         </Route>
 
          <Route path='/nurse' element={<NurseLayout/>}>
-        <Route index element={<NurseDashboard/>} />
+        <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<NurseDashboard/>}/>
         </Route>
         </Route>
@@ -57,6 +58,45 @@ return(
         pauseOnHover
         theme="colored"
       />
+     <Toaster
+  position="top-center"         // top-left, top-right, bottom-left, bottom-right, top-center, bottom-center
+  reverseOrder={false}          // new toasts on top or bottom
+  gutter={8}                    // space between toasts
+  containerClassName=""          // optional extra class for container
+  containerStyle={{}}            // inline style for container
+  toastOptions={{
+    // Default options for all toasts
+    duration: 3000,              // how long toast shows (ms)
+    style: {
+      background: "#00304e",
+      color: "#fff",
+      padding: "16px",
+      borderRadius: "10px",
+      fontWeight: "500",
+    },
+    success: {
+      duration: 2000,
+      icon: '✅',
+    },
+    error: {
+      duration: 4000,
+      icon: '❌',
+      style: {
+        background: "#ff4d4f",
+        color: "#fff",
+      },
+    },
+    warning: {
+      duration: 3000,
+      icon: '⚠️',
+      style: {
+        background: "#ffcc00",
+        color: "#000",
+      },
+    },
+    // You can add more types or override defaults
+  }}
+/>
     </BrowserRouter>
 
     //<Navbar/>

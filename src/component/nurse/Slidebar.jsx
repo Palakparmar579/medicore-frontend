@@ -2,6 +2,7 @@ import React from "react";
 import transparentLogo from "../../assets/transparentLogo.png";
 import user from "../../assets/user.svg";
 import { FaColumns, FaSignOutAlt } from "react-icons/fa";
+import {NavLink } from "react-router-dom";
 
 const NurseSlidebar = ({ handleLogout, handleProfile }) => {
   return (
