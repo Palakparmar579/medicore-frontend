@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash,FaTimes, FaEnvelope  } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
 import toast from "react-hot-toast";
 import axios from "axios";
-import MiniLoader from "../../component/admin/MiniLoader";
-
+import MiniLoader from "../../component/CommonPages/MiniLoader";
+import Forget from "../auth/Forget";
 function Login() {
   const navigate = useNavigate();
   const [LoaderId,setLoaderId]=useState(false)
@@ -14,19 +13,15 @@ function Login() {
   const [errorEmail, seterrorEmail] = useState("");
   const [errorPassword, seterrorPassword] = useState("");
   const [showDisabled, setshowDisabled] = useState(false);
+  const [showPopup, setShowPopup]=useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
- 
-  const handleForget = () => {
-    navigate("/forgetPass");
-  };
-
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     seterrorEmail("");
@@ -68,7 +63,6 @@ setLoaderId(true);
         `${backendUrl}/api/auth/login`,
         form
       );
-
       console.log("Response:", response.data);
 
       if (response.status === 200) {
@@ -76,10 +70,12 @@ setLoaderId(true);
 
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("role", response.data.user.role);
-
+         localStorage.setItem("email", response.data.user.email);
+        localStorage.setItem("userId",response.data.user.id)
+        localStorage.setItem("name",response.data.user.name)
         const role = response.data.user.role;
 
-        // ✅ FIXED: Removed setTimeout + added else-if
+       
         if (role === "admin") {
           navigate("/admin", { replace: true });
         } else if (role === "doctor") {
@@ -102,13 +98,38 @@ setLoaderId(true);
       password: "",
     });
 
-    // ✅ FIXED: was true (wrong)
+   
     setshowDisabled(false);
   };
 
+  const handleForget=()=>{
+    setShowPopup(true);
+  }
+
+  const handleCross=()=>{
+    setShowPopup(false);
+  }
+  const handleCancel=()=>{
+    setShowPopup(false);
+  }
+
+ const handleConfirm=async(email)=>{
+      try{
+         const response= await axios.post(
+          `${backendUrl}/api/request/forgetRequest`,{
+            email
+          })
+          toast.success(response.data.message)
+      }
+      catch(error){
+        toast.error(error.response.data.message)
+      }
+       setShowPopup(false);
+       
+ }
   return (
     <div className="min-h-screen bg-[#00304e] flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-sm max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl bg-gradient-to-br from-white/90 to-transparent backdrop-blur-xl shadow-xl rounded-2xl p-6 sm:p-8 md:p-10">
+      <div className="w-sm max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl bg-gradient-to-br from-white/90 to-transparent backdrop-blur-xl shadow-xl rounded-2xl p-2 sm:p-8 md:p-10">
         
          
         <h2 className="text-xl sm:text-2xl md:text-3xl text-white text-center font-semibold">
@@ -123,12 +144,12 @@ setLoaderId(true);
           {/* Email */}
           <div className="mb-4 sm:mb-5">
             <input
-              type="email"   // ✅ FIXED (removed pattern issue)
+              type="email"   
               name="email"
               placeholder="Email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-md border border-[#00304e] outline-none focus:border-white text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-md border border-[#00304e] outline-none  text-sm sm:text-base"
               required
             />
           </div>
@@ -166,31 +187,7 @@ setLoaderId(true);
             </p>
           )}
 
-          {/* Remember + Forgot */}
-          <div className="flex flex-col sm:flex-row justify-between items-center text-xs sm:text-sm mb-4 sm:mb-6 gap-2 sm:gap-0">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="remember"
-                className="mr-1 cursor-pointer"
-              />
-              <label
-                htmlFor="remember"
-                className="text-white cursor-pointer text-xs sm:text-sm"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <span
-              onClick={handleForget}
-              className="text-blue-900 cursor-pointer text-xs sm:text-sm"
-            >
-              Forgot Password?
-            </span>
-          </div>
-
-          {/* Button */}
+          
 
           <button
             type="submit"
@@ -214,8 +211,28 @@ flex items-center justify-center gap-2`}
            ("Login")
          }
           </button>
+           <div className="flex flex-col sm:flex-row justify-center items-center text-xs sm:text-sm  sm:mb-6  mt-7 ">
+            <span
+              className="text-blue-900 cursor-pointer text-xs sm:text-sm"
+            >
+          Forgot Password?
+            </span>
+            <span 
+            onClick={handleForget}
+            className="text-gray-300 hover:underline cursor-pointer ml-2">
+                Contact Admin
+            </span>
+          </div>
         </form>
       </div>
+      { 
+      showPopup &&
+      <Forget 
+      handleCross={handleCross}
+      handleCancel={handleCancel}
+      handleConfirm={handleConfirm}
+      />
+      }
     </div>
   );
 }

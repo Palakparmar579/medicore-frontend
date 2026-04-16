@@ -14,4 +14,4 @@ if(role&&role!==role){
 }
 return <Outlet/>;
 }
-export default ProtectedRoute
+export default ProtectedRoute;

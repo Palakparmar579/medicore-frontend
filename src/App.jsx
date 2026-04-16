@@ -5,16 +5,18 @@ import Login from './pages/auth/Login';
 import { ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import ManageRoles from './pages/admin/ManageRoles';
-import AdminLayout from './Layout/AdminLayout';
-import DoctorLayout from './Layout/DoctorLayout'
-import NurseLayout from './Layout/NurseLayout'
-import PatientLayout from './Layout/PatientLayout'
 import Dashboard from './pages/admin/Dashboard';
 import PatientDashboard from './pages/patients/DashBoard';
 import NurseDashboard from './pages/nurse/Dashboard';
 import DoctorDashboard from './pages/doctor/Dashboard';
-
+import Forget from "./pages/auth/Forget"
+import NoRequests from './pages/admin/Request';
 import { Toaster } from "react-hot-toast";
+import CommonLayout from './Layout/CommonLayout'
+import Department from './pages/admin/Department'
+import Appointment from './pages/patients/Appointment';
+import AssignDepartment from "./pages/admin/AssignDepartment"
+import AppointmentTable from './pages/doctor/AppintmentTable';
 function App(){ 
 return(
     <BrowserRouter>
@@ -22,29 +24,35 @@ return(
         {/* Login page */}
         <Route path="/" element={<Login />} />
          <Route path="/login" element={<Login />} />
-           
+          <Route path='/forgetpass' element={<Forget/>}/> 
          <Route element={<ProtectedRoute />}>
 
+
         {/* Admin Layout with nested pages */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<CommonLayout/>}>
          {/* Default page */}
          <Route index element={<Navigate to ='Dashboard' replace/>} />
          <Route path="dashboard" element={<Dashboard />} />
         <Route path="manageRoles" element={<ManageRoles />} />
+        <Route path="requests" element={<NoRequests />} />
+        <Route path="department" element={<Department/>}/>
+        <Route path="assignDepartment" element={<AssignDepartment/>}/>
         </Route> {/* <-- Properly close the parent Route */}
 
-        <Route path='/doctor' element={<DoctorLayout/>}>
+        <Route path='/doctor' element={<CommonLayout/>}>
         <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<DoctorDashboard/>}/>
+        <Route path='appointment' element={<AppointmentTable/>}/>
         </Route>
         {/* Doctor */}
 
-         <Route path='/patient' element={<PatientLayout/>}>
+         <Route path='/patient' element={<CommonLayout/>}>
        <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<PatientDashboard/>}/>
+        <Route path='appointment' element={<Appointment/>}/>
         </Route>
 
-         <Route path='/nurse' element={<NurseLayout/>}>
+         <Route path='/nurse' element={<CommonLayout/>}>
         <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<NurseDashboard/>}/>
         </Route>
@@ -58,44 +66,10 @@ return(
         pauseOnHover
         theme="colored"
       />
-     <Toaster
-  position="top-center"         // top-left, top-right, bottom-left, bottom-right, top-center, bottom-center
-  reverseOrder={false}          // new toasts on top or bottom
-  gutter={8}                    // space between toasts
-  containerClassName=""          // optional extra class for container
-  containerStyle={{}}            // inline style for container
-  toastOptions={{
-    // Default options for all toasts
-    duration: 3000,              // how long toast shows (ms)
-    style: {
-      background: "#00304e",
-      color: "#fff",
-      padding: "16px",
-      borderRadius: "10px",
-      fontWeight: "500",
-    },
-    success: {
-      duration: 2000,
-      icon: '✅',
-    },
-    error: {
-      duration: 4000,
-      icon: '❌',
-      style: {
-        background: "#ff4d4f",
-        color: "#fff",
-      },
-    },
-    warning: {
-      duration: 3000,
-      icon: '⚠️',
-      style: {
-        background: "#ffcc00",
-        color: "#000",
-      },
-    },
-    // You can add more types or override defaults
-  }}
+      <Toaster
+  position="top-center"
+  reverseOrder={false}
+  autoClose={2000}
 />
     </BrowserRouter>
 
