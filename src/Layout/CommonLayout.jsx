@@ -6,9 +6,10 @@ import {toast } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmationPopup from '../component/CommonPages/ConfirmationPopup'
 import MiniLoader from "../component/CommonPages/MiniLoader";
+import {decryptData} from "../utils/encrypt"
 function CommonLayout(){
      const navigate = useNavigate()
-     const role=localStorage.getItem("role")
+     const role=decryptData(localStorage.getItem("role"))
     const [showLoader,setShowLoader]=useState(false)
      const [confirmLog, setconfirmLog] = useState(false)   
  const handleLogout = () => {
@@ -36,7 +37,7 @@ function CommonLayout(){
      
      return (
           <div>
-              <div className="flex min-h-screen">
+              <div className="flex min-h-screen ">
  
   <Slidebar
     handleLogout={handleLogout}
@@ -52,7 +53,9 @@ function CommonLayout(){
       pt-20           
       md:pt-6         
       md:ml-56         
-      px-3 sm:px-4 md:px-6
+      px-3 sm:px-5 md:px-6
+      min-w-0
+      sm:pt-20
       transition-all duration-300
     "
   >

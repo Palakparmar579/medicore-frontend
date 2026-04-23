@@ -20,13 +20,13 @@ import {
 import { NavLink } from "react-router-dom";
 
 const AdminSlidebar = ({ role, handleLogout }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 750);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 750);
-      if (window.innerWidth >= 750) setIsOpen(false);
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) setIsOpen(false);
     };
 
     window.addEventListener("resize", handleResize);
@@ -39,26 +39,34 @@ const AdminSlidebar = ({ role, handleLogout }) => {
       { name: "Manage Roles", path: "/admin/manageRoles", icon: <FaUserShield /> },
       { name: "Requests", path: "/admin/requests", icon: <FaEnvelopeOpenText /> },
       { name: "Department", path: "/admin/department", icon: <FaSitemap /> },
-      { name: "Assign Department", path: "/admin/assignDepartment", icon: <FaUserTag /> }
+      { name: "Assign Department", path: "/admin/assignDepartment", icon: <FaUserTag /> },
+      { name: "Profile", path: "/admin/profile", icon: <FaUserTag /> }
+
     ],
     doctor: [
       { name: "Dashboard", path: "/doctor/dashboard", icon: <FaThLarge /> },
       { name: "Appointments", path: "/doctor/appointment", icon: <FaCalendarPlus /> },
-      { name: "Patients", path: "/doctor/patient", icon: <FaUserInjured /> }
+      { name: "Patients", path: "/doctor/patient", icon: <FaUserInjured /> },
+            { name: "Profile", path: "/doctor/profile", icon: <FaUserTag /> }
+
     ],
     nurse: [
-      { name: "Dashboard", path: "/nurse/dashboard", icon: <FaThLarge /> }
+      { name: "Dashboard", path: "/nurse/dashboard", icon: <FaThLarge /> },
+            { name: "Profile", path: "/nurse/profile", icon: <FaUserTag /> }
+
     ],
     patient: [
       { name: "Dashboard", path: "/patient/dashboard", icon: <FaThLarge /> },
       { name: "Book Appointment", path: "/patient/appointment", icon: <FaCalendarPlus /> },
-      { name: "Records", path: "/patient/record", icon: <FaFileMedicalAlt /> }
+      { name: "Records", path: "/patient/record", icon: <FaFileMedicalAlt /> },
+      { name: "Profile", path: "/patient/profile", icon: <FaUserTag /> }
+
     ],
   };
 
   return (
     <>
-      {/* MOBILE TOP BAR */}
+     
       {isMobile && (
         <div className="fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-[1000] shadow-sm">
           <div className="flex items-center gap-2">

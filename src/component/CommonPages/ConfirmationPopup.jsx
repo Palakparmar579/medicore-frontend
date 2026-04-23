@@ -6,6 +6,7 @@ const ConfirmAction = ({
   handleConfirm,
   handleCross,
   message,
+  heading,
   loading = false,
 }) => {
   return (
@@ -19,8 +20,8 @@ const ConfirmAction = ({
           &times;
         </span>
 
-        {/* Title */}
-        <h3 className="text-[18px] font-semibold mb-2">Confirm</h3>
+        
+        <h3 className="text-[18px] font-semibold mb-2">{heading}</h3>
 
         {/* Text */}
         <p className="text-[14px] text-gray-600 leading-relaxed mb-5">{message}</p>

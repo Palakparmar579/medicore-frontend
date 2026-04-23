@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { FaInbox } from "react-icons/fa";
 import { toast } from "react-hot-toast";
-import axios from "axios";
+import api from "../../Config/Axios";
 import ConfirmationPopup from "../../component/CommonPages/ConfirmationPopup";
+import useTitle from "../../hooks/userTitle";
+
 
 const NoRequests = () => {
+  useTitle("Forget Requests")
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const token = localStorage.getItem("token");
+  const token =localStorage.getItem("token");
 
   const [requestId, setRequestId] = useState(null);
   const [currentAction, setCurrentAction] = useState(null);
@@ -26,8 +29,8 @@ const NoRequests = () => {
 
   const fetchPaginationRequest = async (pageNumber = 1) => {
     try {
-      const response = await axios.get(
-        `${backendUrl}/api/request/pagination?page=${pageNumber}&limit=${limit}`
+      const response = await api.get(
+        `/api/request/pagination?page=${pageNumber}&limit=${limit}`
       );
       setUserRequest(response.data.data);
       setPage(response.data.page);
@@ -48,16 +51,12 @@ const NoRequests = () => {
     try {
       setRequestId(actionId);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+     
 
-      const response = await axios.post(
-        `${backendUrl}/api/request/updateRequest`,
+      const response = await api.post(
+        "/api/request/updateRequest",
         { id: actionId, action: selectedAction },
-        config
+       
       );
 
       toast.success(response.data.message);
@@ -96,6 +95,7 @@ const NoRequests = () => {
        
           {showActionPopup && (
             <ConfirmationPopup
+             heading={`Confirm ${nextAction} request`}
               handleCancel={handleActionCancel}
               handleConfirm={handleActionConfirm}
               handleCross={handleActionCross}
@@ -118,7 +118,7 @@ const NoRequests = () => {
             </div>
 
            
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
               <div className="w-full overflow-x-auto">
 
                 <table className="w-full">

@@ -1,19 +1,23 @@
 import { useState } from "react";
-import { FaEye, FaEyeSlash,FaTimes, FaEnvelope  } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaTimes, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import axios from "axios";
+import api from "../../Config/Axios";
 import MiniLoader from "../../component/CommonPages/MiniLoader";
 import Forget from "../auth/Forget";
+import CryptoJS from "crypto-js";
+import whiteLogo1 from '../../assets/whiteLogo1.png'
+import { encryptData } from "../../utils/encrypt";
+
 function Login() {
   const navigate = useNavigate();
-  const [LoaderId,setLoaderId]=useState(false)
+  const [LoaderId, setLoaderId] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorEmail, seterrorEmail] = useState("");
   const [errorPassword, seterrorPassword] = useState("");
   const [showDisabled, setshowDisabled] = useState(false);
-  const [showPopup, setShowPopup]=useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -21,7 +25,7 @@ function Login() {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     seterrorEmail("");
@@ -34,9 +38,6 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
-    console.log("Backend URL:", backendUrl);
-    console.log("Form Data:", form);
 
     if (!form.email) {
       return seterrorEmail("Please enter your email");
@@ -51,31 +52,24 @@ function Login() {
     if (!form.password) {
       return seterrorPassword("Please enter your password");
     }
-setLoaderId(true);
-    
+
+    setLoaderId(true);
     setError("");
 
     try {
       if (showDisabled) return;
       setshowDisabled(true);
 
-      const response = await axios.post(
-        `${backendUrl}/api/auth/login`,
-        form
-      );
-      console.log("Response:", response.data);
+      const response = await api.post("/api/auth/login", form);
 
       if (response.status === 200) {
         toast.success("Login Successfully!");
 
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("role", response.data.user.role);
-         localStorage.setItem("email", response.data.user.email);
-        localStorage.setItem("userId",response.data.user.id)
-        localStorage.setItem("name",response.data.user.name)
+        localStorage.setItem("role", encryptData(response.data.user.role));
+
         const role = response.data.user.role;
 
-       
         if (role === "admin") {
           navigate("/admin", { replace: true });
         } else if (role === "doctor") {
@@ -87,154 +81,155 @@ setLoaderId(true);
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.message||"something went wrong")
+      toast.error(error.response?.data?.message || "something went wrong");
       setshowDisabled(false);
+    } finally {
+      setLoaderId(false);
     }
-  finally{
-    setLoaderId(false);
-  }
-    setForm({
-      email: "",
-      password: "",
-    });
 
-   
+    setForm({ email: "", password: "" });
     setshowDisabled(false);
   };
 
-  const handleForget=()=>{
-    setShowPopup(true);
-  }
+  const handleForget = () => setShowPopup(true);
+  const handleCross = () => setShowPopup(false);
+  const handleCancel = () => setShowPopup(false);
 
-  const handleCross=()=>{
+  const handleConfirm = async (email) => {
+    try {
+      const response = await api.post("/api/request/forgetRequest", { email });
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
     setShowPopup(false);
-  }
-  const handleCancel=()=>{
-    setShowPopup(false);
-  }
+  };
 
- const handleConfirm=async(email)=>{
-      try{
-         const response= await axios.post(
-          `${backendUrl}/api/request/forgetRequest`,{
-            email
-          })
-          toast.success(response.data.message)
-      }
-      catch(error){
-        toast.error(error.response.data.message)
-      }
-       setShowPopup(false);
-       
- }
-  return (
-    <div className="min-h-screen bg-[#00304e] flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-sm max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl bg-gradient-to-br from-white/90 to-transparent backdrop-blur-xl shadow-xl rounded-2xl p-2 sm:p-8 md:p-10">
-        
-         
-        <h2 className="text-xl sm:text-2xl md:text-3xl text-white text-center font-semibold">
-          Sign in
+ return (
+  <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-br from-[#0b1220] via-[#0f172a] to-[#1e3a8a] relative overflow-hidden">
+
+    {/* Background glow */}
+    <div className="absolute w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[160px] top-[-150px] left-[-150px]"></div>
+    <div className="absolute w-[450px] h-[450px] bg-indigo-500/10 rounded-full blur-[160px] bottom-[-120px] right-[-120px]"></div>
+
+    {/* Card */}
+    <div className="relative w-full max-w-md bg-[#0f172a]/90 backdrop-blur-xl border border-blue-900/40 rounded-2xl shadow-[0_25px_70px_rgba(0,0,0,0.6)] px-6 py-10 sm:px-10">
+
+      {/* Header */}
+      <div className="text-center mb-8">
+
+        {/* Logo Glow */}
+        <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+
+          <div className="absolute w-20 h-20 bg-blue-500/30 blur-2xl rounded-full"></div>
+
+          <img
+            src={whiteLogo1}
+            className="relative w-14 h-14 object-contain drop-shadow-[0_0_18px_rgba(37,99,235,0.5)]"
+            alt="logo"
+          />
+        </div>
+
+        <h2 className="mt-3 text-2xl font-bold text-white tracking-wide">
+          Medi<span className="text-blue-400">Core</span>
         </h2>
 
-        <p className="text-[#e8f7ff] text-center mt-2 sm:mt-3 mb-5 sm:mb-6 text-sm sm:text-base">
-          Enter your credentials to log in
+        <p className="text-gray-400 text-sm mt-1">
+          Smart Healthcare System
         </p>
+      </div>
 
-        <form onSubmit={handleLogin}>
-          {/* Email */}
-          <div className="mb-4 sm:mb-5">
-            <input
-              type="email"   
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-md border border-[#00304e] outline-none  text-sm sm:text-base"
-              required
-            />
-          </div>
+      <form onSubmit={handleLogin} className="space-y-5">
+
+        {/* Email */}
+        <div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={form.email}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-xl bg-[#111827] text-white border border-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500"
+          />
 
           {errorEmail && (
-            <p className="text-red-600 mb-2 sm:mb-3 text-xs sm:text-base">
-              {errorEmail}
-            </p>
+            <p className="text-red-400 text-xs mt-1">{errorEmail}</p>
           )}
+        </div>
 
-          {/* Password */}
-          <div className="mb-4 sm:mb-5 relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              
-              title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
-              onChange={handleChange}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-md border border-[#00304e] outline-none focus:border-white text-sm sm:text-base"
-              required
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2.5 sm:top-3 cursor-pointer text-white text-sm sm:text-base"
-            >
-              {showPassword ? <FaEye /> : <FaEyeSlash />}
-            </span>
-          </div>
+        {/* Password */}
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            className="w-full px-4 py-3 pr-10 rounded-xl bg-[#111827] text-white border border-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-500"
+          />
+
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-blue-400 transition"
+          >
+            {showPassword ? <FaEye /> : <FaEyeSlash />}
+          </span>
 
           {errorPassword && (
-            <p className="text-red-600 mb-2 sm:mb-3 text-xs sm:text-base">
-              {errorPassword}
-            </p>
+            <p className="text-red-400 text-xs mt-1">{errorPassword}</p>
           )}
+        </div>
 
-          
+        {/* Button */}
+        <button
+          type="submit"
+          disabled={showDisabled || LoaderId}
+          className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg
+          ${
+            !isFormFilled || showDisabled || LoaderId
+              ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98]"
+          }`}
+        >
+          {LoaderId ? (
+            <>
+              <MiniLoader size="w-4 h-4" />
+              Logging in...
+            </>
+          ) : (
+            "Login"
+          )}
+        </button>
 
-          <button
-            type="submit"
-            disabled={showDisabled||LoaderId}
-            className={`${
-  !isFormFilled || showDisabled || LoaderId
-    ? "cursor-not-allowed opacity-60"
-    : "cursor-pointer hover:scale-105 active:scale-95"
-} 
-w-full py-2 sm:py-3 rounded-md text-white 
-transition-all duration-300 ease-in-out 
-bg-[#00416A] hover:bg-[#035a90] 
-shadow-md hover:shadow-lg 
-text-sm sm:text-base 
-flex items-center justify-center gap-2`}
-          >
-         { LoaderId?(
-          <><MiniLoader size="w-4 h-4"/>
-          Logging in...
-          </>):
-           ("Login")
-         }
-          </button>
-           <div className="flex flex-col sm:flex-row justify-center items-center text-xs sm:text-sm  sm:mb-6  mt-7 ">
-            <span
-              className="text-blue-900 cursor-pointer text-xs sm:text-sm"
-            >
-          Forgot Password?
-            </span>
-            <span 
+        {/* Footer */}
+        <div className="text-center text-sm mt-6 space-y-2">
+
+          <p className="text-gray-400">
+            Forgot your password?
+          </p>
+
+          <p
             onClick={handleForget}
-            className="text-gray-300 hover:underline cursor-pointer ml-2">
-                Contact Admin
-            </span>
-          </div>
-        </form>
-      </div>
-      { 
-      showPopup &&
-      <Forget 
-      handleCross={handleCross}
-      handleCancel={handleCancel}
-      handleConfirm={handleConfirm}
-      />
-      }
+            className="text-blue-400 font-medium hover:text-blue-300 cursor-pointer transition"
+          >
+            Contact Admin
+          </p>
+
+        </div>
+
+      </form>
     </div>
-  );
+
+    {/* Popup */}
+    {showPopup && (
+      <Forget
+        handleCross={handleCross}
+        handleCancel={handleCancel}
+        handleConfirm={handleConfirm}
+      />
+    )}
+  </div>
+);
 }
 
 export default Login;

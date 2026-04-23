@@ -17,6 +17,10 @@ import Department from './pages/admin/Department'
 import Appointment from './pages/patients/Appointment';
 import AssignDepartment from "./pages/admin/AssignDepartment"
 import AppointmentTable from './pages/doctor/AppintmentTable';
+import Profile from './pages/admin/Profile';
+import PatientProfile from './pages/patients/Profile';
+import NurseProfile from './pages/nurse/Profile';
+import DoctorProfile from './pages/doctor/Profile';
 function App(){ 
 return(
     <BrowserRouter>
@@ -37,12 +41,14 @@ return(
         <Route path="requests" element={<NoRequests />} />
         <Route path="department" element={<Department/>}/>
         <Route path="assignDepartment" element={<AssignDepartment/>}/>
+         <Route path="profile" element={<Profile/>}/>
         </Route> {/* <-- Properly close the parent Route */}
 
         <Route path='/doctor' element={<CommonLayout/>}>
         <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<DoctorDashboard/>}/>
         <Route path='appointment' element={<AppointmentTable/>}/>
+        <Route path="profile" element={<DoctorProfile/>}/>
         </Route>
         {/* Doctor */}
 
@@ -50,11 +56,14 @@ return(
        <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<PatientDashboard/>}/>
         <Route path='appointment' element={<Appointment/>}/>
+        <Route path="profile" element={<PatientProfile/>}/>
         </Route>
 
          <Route path='/nurse' element={<CommonLayout/>}>
         <Route index element={<Navigate to ='Dashboard' replace/>} />
         <Route path='dashboard' element={<NurseDashboard/>}/>
+        <Route path="profile" element={<NurseProfile/>}/>
+
         </Route>
         </Route>
       </Routes>

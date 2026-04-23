@@ -6,7 +6,7 @@ import {
 
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
-import axios from "axios";
+import api from "../../Config/Axios";
 function Appointment() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [getDoctor, setGetDoctor] = useState([]);
@@ -46,8 +46,8 @@ const [page, setPage] = useState(1);
 
   const fetchAppointments=async()=>{
     try{
-    const response=await axios.get(
-      `${backendUrl}/api/appointmentPatient/getAppointment`
+    const response=await api.get(
+      "/api/appointmentPatient/getAppointment"
     )
     setgetAppointment(response.data)
     }
@@ -59,7 +59,7 @@ const [page, setPage] = useState(1);
 
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/department/getDep`);
+      const response = await api.get("/api/department/getDep");
       setGetDoctor(response.data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -95,8 +95,8 @@ const [page, setPage] = useState(1);
 
 const fetchPaginationAppointment = async (pageNumber = 1) => {
     try {
-      const response = await axios.get(
-        `${backendUrl}/api/appointmentPatient/pagination?page=${pageNumber}&limit=${limit}`
+      const response = await api.get(
+        `/api/appointmentPatient/pagination?page=${pageNumber}&limit=${limit}`
       );
       setUserappointment(response.data.data);
       setPage(response.data.page);
@@ -163,8 +163,8 @@ if (isSlotTaken) {
 )}
 
    try{
-  const response=await axios.post(
-     `${backendUrl}/api/appointmentPatient/register`,{
+  const response=await api.post(
+     "/api/appointmentPatient/register",{
       firstName:name,
      mobNumber: formData.mobNumber,
     gender: formData.gender,
